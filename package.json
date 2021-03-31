@@ -84,6 +84,7 @@
     "mongoose": "^5.2.17",
     "morgan": "^1.8.1",
     "nodemailer": "^6.3.1",
+    "opn-cli": "^5.0.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "passport-jwt": "4.0.0",
@@ -104,7 +105,6 @@
     "mocha": "^6.2.2",
     "nodemon": "^2.0.1",
     "nyc": "^14.1.1",
-    "opn-cli": "^5.0.0",
     "sinon": "^7.5.0",
     "sinon-chai": "^3.0.0",
     "supertest": "^4.0.2"
