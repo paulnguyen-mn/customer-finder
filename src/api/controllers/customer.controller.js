@@ -2,7 +2,9 @@ const puppeteer = require('puppeteer');
 
 const test = async () => {
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     const q = encodeURIComponent('minh long');
     await page.goto(`https://www.google.com/search?q=${q}`);
