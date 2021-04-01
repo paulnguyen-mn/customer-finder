@@ -1,41 +1,34 @@
-const puppeteer = require('puppeteer');
-
-const test = async () => {
-  try {
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-    const page = await browser.newPage();
-    const q = encodeURIComponent('minh long');
-    await page.goto(`https://www.google.com/search?q=${q}`);
-    const result = await page.evaluate(() => {
-      // eslint-disable-next-line no-undef
-      const itemList = document.querySelectorAll('.g');
-      const linkList = [];
-      itemList.forEach((item) => {
-        const link = item.querySelector('a');
-        if (link) linkList.push(link.href);
-      });
-
-      return linkList.filter((x) => !!x);
-    });
-
-    browser.close();
-    return result;
-  } catch (error) {
-    console.log('Failed to fetch', error);
-    return null;
-  }
-};
+const puppeteerProvider = require('../services/puppeteerProvider');
 
 /**
  * Load user and append to req.
  * @public
  */
-exports.test = async (req, res, next) => {
+exports.searchLinks = async (req, res, next) => {
   try {
-    const result = await test();
-    return res.json({ data: result });
+    const name = req.query.q;
+    const linkList = await puppeteerProvider.searchLinks(name);
+    return res.json({ data: linkList });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.searchEmailsByURL = async (req, res, next) => {
+  try {
+    const url = req.query.ref;
+    const emailList = await puppeteerProvider.searchEmailsByURL(url);
+    return res.json({ data: emailList });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.searchLinkedInURLs = async (req, res, next) => {
+  try {
+    const url = req.query.q;
+    const linkList = await puppeteerProvider.searchLinkedInURLs(url);
+    return res.json({ data: linkList });
   } catch (error) {
     return next(error);
   }
