@@ -37,6 +37,30 @@ exports.searchLinks = async (url) => {
   }
 };
 
+const getEmailsByURL = async (url) => {
+  try {
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+
+    // Search google with query
+    await page.goto(url);
+
+    // Retrieve the URLs from search result
+    const EMAIL_REGEX = /[a-zA-Z._-]+@[a-zA-Z0-9-]+\.(com|vn|com.vn)+/gi;
+    const pageContent = await page.content();
+    const matchList = pageContent.matchAll(EMAIL_REGEX);
+    const emailList = [...matchList].map((match) => match[0]).filter((x) => x.length < 50);
+
+    browser.close();
+    return emailList;
+  } catch (error) {
+    console.log('Failed to search google', error);
+    return [];
+  }
+};
+
 const getEmailsByQuery = async (q) => {
   try {
     const browser = await puppeteer.launch({
@@ -48,7 +72,7 @@ const getEmailsByQuery = async (q) => {
     await page.goto(`https://www.google.com/search?q=${q}`);
 
     // Retrieve the URLs from search result
-    const EMAIL_REGEX = /[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.(com|vn|com.vn)+/gi;
+    const EMAIL_REGEX = /[a-zA-Z._-]+@[a-zA-Z0-9-]+\.(com|vn|com.vn)+/gi;
     const pageContent = await page.content();
     const matchList = pageContent.matchAll(EMAIL_REGEX);
     const emailList = [...matchList].map((match) => match[0]).filter((x) => x.length < 50);
@@ -67,8 +91,8 @@ exports.searchEmailsByURL = async (url) => {
   try {
     const domain = retrieveDomainFromURL(url);
     const [list1, list2] = await Promise.all([
-      getEmailsByQuery(`vn + email + @${domain}`),
-      getEmailsByQuery(`vn + viec lam + @${domain}`),
+      getEmailsByQuery(`"@${domain}"`),
+      getEmailsByURL(url),
     ]);
 
     return list1.concat(list2);
