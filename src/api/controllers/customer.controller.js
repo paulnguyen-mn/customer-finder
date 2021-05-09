@@ -37,15 +37,14 @@ exports.searchEmailsByURL = async (req, res, next) => {
 exports.getDetailsByURL = async (req, res, next) => {
   try {
     const { url } = req.query;
-    const [profiles, emails, links] = await Promise.all([
-      puppeteerProvider.searchCompanyProfiles(url),
+    const [emails, links] = await Promise.all([
+      // puppeteerProvider.searchCompanyProfiles(url),
       puppeteerProvider.searchEmailsByURL(url),
       puppeteerProvider.searchLinks(url),
     ]);
 
     return res.json({
       data: {
-        profiles,
         emails,
         links,
       },
