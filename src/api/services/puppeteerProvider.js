@@ -32,7 +32,7 @@ exports.searchLinks = async (url) => {
     browser.close();
     return result;
   } catch (error) {
-    console.log('Failed to search google', error);
+    console.log('Failed to search searchLinks', error);
     return [];
   }
 };
@@ -54,7 +54,7 @@ const getEmailsByURL = async (url) => {
     const emailList = [...matchList].map((match) => match[0]).filter((x) => x.length < 50);
 
     browser.close();
-    return emailList;
+    return emailList.filter((x) => !!x);
   } catch (error) {
     console.log('Failed to search google', error);
     return [];
@@ -68,19 +68,32 @@ const getEmailsByQuery = async (q) => {
     });
     const page = await browser.newPage();
 
+    page.on('console', (consoleObj) => console.log(consoleObj.text()));
+
     // Search google with query
     await page.goto(`https://www.google.com/search?q=${q}`);
 
     // Retrieve the URLs from search result
-    const EMAIL_REGEX = /[a-zA-Z._-]+@[a-zA-Z0-9-]+\.(com|vn|com.vn)+/gi;
-    const pageContent = await page.content();
-    const matchList = pageContent.matchAll(EMAIL_REGEX);
-    const emailList = [...matchList].map((match) => match[0]).filter((x) => x.length < 50);
+    const result = await page.evaluate(() => {
+      // Retrieve the URLs from search result
+      const EMAIL_REGEX = /[a-zA-Z._-]+@[a-zA-Z0-9-]+\.(com|vn|com.vn)+/gi;
+      // eslint-disable-next-line no-undef
+      const itemList = document.querySelectorAll('.g');
+      let emailList = [];
+
+      itemList.forEach((item) => {
+        const matchList = item.textContent.matchAll(EMAIL_REGEX);
+        const list = [...matchList].map((match) => match[0]).filter((x) => x.length < 50);
+        emailList = emailList.concat(list);
+      });
+
+      return emailList.filter((x) => !!x);
+    });
 
     browser.close();
-    return emailList;
+    return result;
   } catch (error) {
-    console.log('Failed to search google', error);
+    console.log('Failed to getEmailsByQuery', error);
     return [];
   }
 };
@@ -90,14 +103,16 @@ exports.searchEmailsByURL = async (url) => {
 
   try {
     const domain = retrieveDomainFromURL(url);
-    const [list1, list2] = await Promise.all([
+    const [list1, list2, list3] = await Promise.all([
       getEmailsByQuery(`"@${domain}"`),
+      getEmailsByQuery(`tuyen dung "@${domain}"`),
       getEmailsByURL(url),
     ]);
 
-    return list1.concat(list2);
+    const list = list1.concat(list2).concat(list3);
+    return Array.from(new Set(list));
   } catch (error) {
-    console.log('Failed to search google', error);
+    console.log('Failed to searchEmailsByURL', error);
     return [];
   }
 };
@@ -109,7 +124,6 @@ exports.searchCompanyProfiles = async (url) => {
     });
     const page = await browser.newPage();
 
-    // Search google with query
     // Search google with query
     const domain = retrieveDomainFromURL(url);
     const q = `masothue + ${domain}`;
@@ -132,8 +146,10 @@ exports.searchCompanyProfiles = async (url) => {
     if (!firstValidLink) return [];
 
     // Go to page and parse
-    await new Promise((resolve) => setTimeout(resolve(), Math.trunc(Math.random() * 300)));
+    await new Promise((resolve) => setTimeout(resolve(), Math.trunc(Math.random() * 200)));
+    console.log('Go to', firstValidLink);
     await page.goto(firstValidLink);
+    console.log('Go to successfully', firstValidLink);
 
     const profile = await page.evaluate(() => {
       const table = document.querySelector('.table-taxinfo');
@@ -166,7 +182,7 @@ exports.searchCompanyProfiles = async (url) => {
     browser.close();
     return [profile];
   } catch (error) {
-    console.log('Failed to search google', error);
+    console.log('Failed to search searchCompanyProfiles', error);
     return [];
   }
 };
