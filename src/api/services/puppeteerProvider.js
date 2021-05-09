@@ -7,7 +7,7 @@ exports.searchLinks = async (url) => {
     if (!url) return [];
 
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
     });
     const page = await browser.newPage();
 
@@ -40,7 +40,7 @@ exports.searchLinks = async (url) => {
 const getEmailsByURL = async (url) => {
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
     });
     const page = await browser.newPage();
 
@@ -64,7 +64,7 @@ const getEmailsByURL = async (url) => {
 const getEmailsByQuery = async (q) => {
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
     });
     const page = await browser.newPage();
 
@@ -105,7 +105,7 @@ exports.searchEmailsByURL = async (url) => {
 exports.searchCompanyProfiles = async (url) => {
   try {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
     });
     const page = await browser.newPage();
 
