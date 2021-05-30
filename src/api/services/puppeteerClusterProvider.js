@@ -7,7 +7,7 @@ exports.searchCompanyDetails = async (url) => {
   // Create a cluster with 2 workers
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 2,
+    maxConcurrency: 3,
     puppeteerOptions: {
       args: ['--no-sandbox'],
     },
@@ -83,7 +83,6 @@ exports.searchCompanyDetails = async (url) => {
       return linkList.filter((x) => !!x);
     });
 
-    console.log('Search links', validLinks);
     details.links = details.links.concat(validLinks);
   };
 
@@ -113,9 +112,7 @@ exports.searchCompanyDetails = async (url) => {
 
     // Visit the first valid link
     await new Promise((resolve) => setTimeout(resolve(), Math.trunc(Math.random() * 200)));
-    console.log('Go to', firstValidLink);
     await page.goto(firstValidLink);
-    console.log('Go to successfully', firstValidLink);
 
     // Retrieve details of the first URL
     const profile = await page.evaluate(() => {
@@ -148,14 +145,16 @@ exports.searchCompanyDetails = async (url) => {
       return company;
     });
 
-    console.log('Fetch data profile', profile);
     details.profile = profile;
   };
 
   // Queue list of tasks for emails
-  cluster.queue(`@${domain}`, searchEmails);
-  cluster.queue(`tuyển dụng + "@${domain}"`, searchEmails);
+  cluster.queue(`"@${domain}"`, searchEmails);
+  cluster.queue(`tuyển dụng "@${domain}"`, searchEmails);
+  cluster.queue(`họp tác "@${domain}"`, searchEmails);
   cluster.queue(`hr + "@${domain}"`, searchEmails);
+  cluster.queue(`giám đốc + "@${domain}"`, searchEmails);
+  cluster.queue(`email + "@${domain}"`, searchEmails);
   cluster.queue(url, getEmailsFromURL);
 
   // for LinkedIn URLs
