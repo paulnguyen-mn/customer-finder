@@ -7,9 +7,9 @@ exports.searchCompanyDetails = async (url) => {
   // Create a cluster with 2 workers
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
-    maxConcurrency: 3,
+    maxConcurrency: 2,
     puppeteerOptions: {
-      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
+      args: ['--no-sandbox'],
     },
   });
 
