@@ -1,4 +1,5 @@
 const puppeteerProvider = require('../services/puppeteerProvider');
+const puppeteerClusterProvider = require('../services/puppeteerClusterProvider');
 
 /**
  * Load user and append to req.
@@ -37,17 +38,10 @@ exports.searchEmailsByURL = async (req, res, next) => {
 exports.getDetailsByURL = async (req, res, next) => {
   try {
     const { url } = req.query;
-    const [emails, links] = await Promise.all([
-      // puppeteerProvider.searchCompanyProfiles(url),
-      puppeteerProvider.searchEmailsByURL(url),
-      puppeteerProvider.searchLinks(url),
-    ]);
+    const companyDetails = await puppeteerClusterProvider.searchCompanyDetails(url);
 
     return res.json({
-      data: {
-        emails,
-        links,
-      },
+      data: companyDetails,
     });
   } catch (error) {
     return next(error);
