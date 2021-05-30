@@ -8,6 +8,9 @@ exports.searchCompanyDetails = async (url) => {
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 3,
+    puppeteerOptions: {
+      args: ['--no-sandbox', '--incognito', '--single-process', '--no-zygote'],
+    },
   });
 
   // Event handler to be called in case of problems
