@@ -12,9 +12,9 @@ const strategies = require('./passport');
 const error = require('../api/middlewares/error');
 
 /**
-* Express instance
-* @public
-*/
+ * Express instance
+ * @public
+ */
 const app = express();
 
 // request logging. dev: console | production: file
@@ -35,7 +35,11 @@ app.use(methodOverride());
 app.use(helmet());
 
 // enable CORS - Cross Origin Resource Sharing
-app.use(cors());
+const corsOptions = {
+  origin: 'https://customer-finder-webapp.vercel.app',
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 
 // enable authentication
 app.use(passport.initialize());
